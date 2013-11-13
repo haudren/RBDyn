@@ -31,7 +31,7 @@
 #include "MultiBody.h"
 #include "MultiBodyGraph.h"
 #include "MultiBodyConfig.h"
-
+#include "tools.h"
 
 BOOST_AUTO_TEST_CASE(MultiBodyGraphTest)
 {
@@ -201,7 +201,11 @@ BOOST_AUTO_TEST_CASE(MultiBodyTest)
 	Vector3d tmp = Vector3d::Random();
 
 	PTransformd I = PTransformd::Identity();
-	std::vector<PTransformd> Xt = {I, I, PTransformd(tmp), I};
+	std::vector<PTransformd> Xt(4);
+	Xt[0] = I;
+	Xt[1] = I;
+	Xt[2] = PTransformd(tmp);
+	Xt[3] = I;
 
 	MultiBody mb(bodies, joints, pred, succ, parent, Xt);
 
@@ -311,7 +315,8 @@ BOOST_AUTO_TEST_CASE(MakeMultiBodyTest)
 	std::vector<int> parent = {-1, 0, 0, 2};
 
 	PTransformd I = PTransformd::Identity();
-	std::vector<PTransformd> Xt = {I, I, I, I};
+	std::vector<PTransformd> Xt;
+	resetVector(Xt, 4, I);
 
 	// check MultiBody equality
 	checkMultiBodyEq(mb1, bodies, joints, pred, succ, parent, Xt);
@@ -356,7 +361,7 @@ BOOST_AUTO_TEST_CASE(MakeMultiBodyTest)
 	succ = {0, 1, 2, 3};
 	parent = {-1, 0, 1, 2};
 
-	Xt = {I, I, I, I};
+	resetVector(Xt, 4, I);
 
 	// check joint j1 direction
 	// check bodyIndexById
@@ -414,10 +419,11 @@ BOOST_AUTO_TEST_CASE(MakeMultiBodyTest)
 	succ = {0, 1, 2, 3};
 	parent = {-1, 0, 1, 1};
 
-	Xt = {root,
-				PTransformd(Vector3d(1., 0., 0.)),
-				PTransformd(Vector3d(1., 1., 0.)),
-				PTransformd(RotX(constants::pi<double>()/2.), Vector3d(0., 1., 0.))};
+	Xt.resize(4);
+	Xt[0] = root;
+	Xt[1] = PTransformd(Vector3d(1., 0., 0.));
+	Xt[2] = PTransformd(Vector3d(1., 1., 0.));
+	Xt[3] = PTransformd(RotX(constants::pi<double>()/2.), Vector3d(0., 1., 0.));
 
 	// check MultiBody equality
 	checkMultiBodyEq(mb4, bodies, joints, pred, succ, parent, Xt);
@@ -653,8 +659,11 @@ BOOST_AUTO_TEST_CASE(ConfigConverterTest)
 	mbc1.q = {{}, {1., 0., 0., 0.}, {1.}, {2.}};
 	mbc1.alpha = {{}, {1., 0., 0., 0.}, {1.2}, {2.2}};
 	mbc1.alphaD = {{}, {0., 3., 2.}, {1.4}, {2.3}};
-	mbc1.force = {ForceVecd(Vector6d::Random()), ForceVecd(Vector6d::Random()),
-								ForceVecd(Vector6d::Random()), ForceVecd(Vector6d::Random())};
+	mbc1.force.resize(4);
+	mbc1.force[0] = ForceVecd(Vector6d::Random());
+	mbc1.force[1] = ForceVecd(Vector6d::Random());
+	mbc1.force[2] = ForceVecd(Vector6d::Random());
+	mbc1.force[3] = ForceVecd(Vector6d::Random());
 
 	mb1tomb2->sConvert(mbc1, mbc2);
 	mb2tomb1->sConvert(mbc2, mbc1Tmp);

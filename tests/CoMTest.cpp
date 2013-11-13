@@ -33,6 +33,7 @@
 #include "MultiBodyConfig.h"
 #include "MultiBodyGraph.h"
 #include "CoM.h"
+#include "tools.h"
 
 const double TOL = 0.000001;
 
@@ -100,7 +101,6 @@ BOOST_AUTO_TEST_CASE(computeCoMTest)
 	BOOST_CHECK_EQUAL(CoMV, Vector3d::Zero());
 
 
-
 	mbc.q = {{}, {cst::pi<double>()/2.}, {0.}, {0.}};
 	forwardKinematics(mb, mbc);
 
@@ -116,12 +116,13 @@ BOOST_AUTO_TEST_CASE(computeCoMTest)
 
 
 	// test safe version
-	mbc.bodyPosW = {I, I, I};
+	resetVector(mbc.bodyPosW, 3, PTransformd(I));
 	BOOST_CHECK_THROW(sComputeCoM(mb, mbc), std::domain_error);
 	BOOST_CHECK_THROW(sComputeCoMVelocity(mb, mbc), std::domain_error);
 
-	mbc.bodyPosW = {I, I, I, I};
-	mbc.bodyVelB = {v, v, v};
+	resetVector(mbc.bodyPosW, 4, PTransformd(I));
+	resetVector(mbc.bodyVelB, 3, MotionVecd(v));
+
 	BOOST_CHECK_NO_THROW(sComputeCoM(mb, mbc));
 	BOOST_CHECK_THROW(sComputeCoMVelocity(mb, mbc), std::domain_error);
 }
@@ -341,7 +342,7 @@ BOOST_AUTO_TEST_CASE(CoMJacobianDummyTest)
 
 	// test safe functions
 
-	mbc.bodyPosW = {I, I, I};
+	resetVector(mbc.bodyPosW, 3, PTransformd(I));
 	BOOST_CHECK_THROW(comJac.sJacobian(mb, mbc), std::domain_error);
 	mbc = MultiBodyConfig(mb);
 
@@ -443,16 +444,16 @@ BOOST_AUTO_TEST_CASE(CoMJacobianDummyTest)
 
 	// test safe functions
 
-	mbc.bodyPosW = {I, I, I};
+	resetVector(mbc.bodyPosW, 3, PTransformd(I));
 	BOOST_CHECK_THROW(comJac.sJacobianDot(mb, mbc), std::domain_error);
 	mbc = MultiBodyConfig(mb);
 
 	MotionVecd mv;
-	mbc.bodyVelB = {mv, mv, mv};
+	resetVector(mbc.bodyVelB, 3, MotionVecd(mv));
 	BOOST_CHECK_THROW(comJac.sJacobianDot(mb, mbc), std::domain_error);
 	mbc = MultiBodyConfig(mb);
 
-	mbc.bodyVelW = {mv, mv, mv};
+	resetVector(mbc.bodyVelW, 3, MotionVecd(mv));
 	BOOST_CHECK_THROW(comJac.sJacobianDot(mb, mbc), std::domain_error);
 	mbc = MultiBodyConfig(mb);
 }

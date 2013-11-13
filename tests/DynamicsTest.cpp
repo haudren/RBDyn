@@ -36,9 +36,9 @@
 #include "MultiBody.h"
 #include "MultiBodyConfig.h"
 #include "MultiBodyGraph.h"
+#include "tools.h"
 
 const double TOL = 0.0000001;
-
 
 BOOST_AUTO_TEST_CASE(OneBody)
 {
@@ -104,8 +104,9 @@ BOOST_AUTO_TEST_CASE(OneBody)
 	MotionVecd gravity(Vector3d::Zero(), Vector3d(0., 9.81, 0.));
 	ForceVecd gravityB1 = mb.body(0).inertia()*(mbc2.bodyPosW[0]*gravity);
 	ForceVecd gravityB2 = mb.body(1).inertia()*(mbc2.bodyPosW[1]*gravity);
-	mbc2.force = {gravityB1,
-								gravityB2};
+	mbc2.force.resize(2);
+	mbc2.force[0] = gravityB1;
+	mbc2.force[1] = gravityB2;
 	id.inverseDynamics(mb, mbc2);
 
 	torque = Vector3d(0., 0., 0.5).cross(Vector3d(0., -9.81, 0.))(0);
@@ -249,10 +250,7 @@ BOOST_AUTO_TEST_CASE(IDvsFDFixed)
 	mbc.q = {{}, {1., 0., 0., 0.}, {0.}, {0.}};
 	mbc.alpha = {{}, {0., 0., 0.}, {0.}, {0.}};
 	mbc.alphaD = {{}, {0., 0., 0.}, {0.}, {0.}};
-	mbc.force = {ForceVecd(Vector6d::Zero()),
-							 ForceVecd(Vector6d::Zero()),
-							 ForceVecd(Vector6d::Zero()),
-							 ForceVecd(Vector6d::Zero())};
+	resetVector(mbc.force,4, ForceVecd(Vector6d::Zero()));
 
 	forwardKinematics(mb, mbc);
 	forwardVelocity(mb, mbc);
@@ -408,10 +406,7 @@ BOOST_AUTO_TEST_CASE(IDvsFDFree)
 	mbc.q = {{1., 0., 0., 0., 0., 0., 0.}, {1., 0., 0., 0.}, {0.}, {0.}};
 	mbc.alpha = {{0., 0., 0., 0., 0., 0.}, {0., 0., 0.}, {0.}, {0.}};
 	mbc.alphaD = {{0., 0., 0., 0., 0., 0.}, {0., 0., 0.}, {0.}, {0.}};
-	mbc.force = {ForceVecd(Vector6d::Zero()),
-							 ForceVecd(Vector6d::Zero()),
-							 ForceVecd(Vector6d::Zero()),
-							 ForceVecd(Vector6d::Zero())};
+	resetVector(mbc.force, 4,ForceVecd(Vector6d::Zero()));
 
 	forwardKinematics(mb, mbc);
 	forwardVelocity(mb, mbc);

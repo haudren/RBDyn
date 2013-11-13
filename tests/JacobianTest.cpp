@@ -167,7 +167,11 @@ BOOST_AUTO_TEST_CASE(JacobianConstructTest)
 	std::vector<int> parent = {-1, 0, 1, 2};
 
 	PTransformd unitY(Vector3d(0., 1., 0.));
-	std::vector<PTransformd> Xt = {I, to, unitY, unitY};
+	std::vector<PTransformd> Xt(4);
+	Xt[0] = I;
+	Xt[1] = to;
+	Xt[2] = unitY;
+	Xt[3] = unitY;
 
 
 	checkMultiBodyEq(chain1, bodies, joints, pred, succ, parent, Xt);
@@ -181,7 +185,10 @@ BOOST_AUTO_TEST_CASE(JacobianConstructTest)
 	succ = {0, 1, 2};
 	parent = {-1, 0, 1};
 
-	Xt = {I, to, PTransformd(Vector3d(0.5, 0.5, 0.))};
+  Xt.resize(3);
+  Xt[0] = I;
+  Xt[1] = to;
+  Xt[2] = PTransformd(Vector3d(0.5, 0.5, 0.));
 
 
 	checkMultiBodyEq(chain2, bodies, joints, pred, succ, parent, Xt);
