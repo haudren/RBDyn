@@ -29,8 +29,8 @@ void forwardAcceleration(const MultiBody& mb, MultiBodyConfig& mbc,
 	const sva::MotionVecd& A_0)
 {
 	const std::vector<Joint>& joints = mb.joints();
-	const std::vector<int>& pred = mb.predecessors();
-	const std::vector<int>& succ = mb.successors();
+	const std::vector<Index>& pred = mb.predecessors();
+	const std::vector<Index>& succ = mb.successors();
 
 	for(std::size_t i = 0; i < joints.size(); ++i)
 	{

@@ -25,10 +25,29 @@
 // SpaceVecAlg
 #include <SpaceVecAlg/SpaceVecAlg>
 
+//Boost
+#include <boost/strong_typedef.hpp>
+
 namespace rbd
 {
+BOOST_STRONG_TYPEDEF(int, Id)
+}
 
+namespace std {
+  template<>
+  struct hash<rbd::Id>
+  {
+    std::size_t operator()(const rbd::Id& i) const
+    {
+      using std::size_t;
+      using std::hash;
+      return hash<int>()(i.t);
+    }
+  };
+} // namespace std
 
+namespace rbd
+{
 /**
 	* Utility function to compute a rotation matrix from the parameter vector.
 	* @param q parameter vector with a least 4 values.
@@ -146,7 +165,7 @@ public:
 	}
 
 	/// @return Joint id.
-	int id() const
+	Id id() const
 	{
 		return id_;
 	}
@@ -251,7 +270,7 @@ private:
 	int params_;
 	int dof_;
 
-	int id_;
+	Id id_;
 	std::string name_;
 };
 

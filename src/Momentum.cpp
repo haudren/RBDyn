@@ -304,8 +304,8 @@ sva::ForceVecd CentroidalMomentumMatrix::normalMomentumDot(
 {
 	using namespace Eigen;
 
-	const std::vector<int>& pred = mb.predecessors();
-	const std::vector<int>& succ = mb.successors();
+	const std::vector<Index>& pred = mb.predecessors();
+	const std::vector<Index>& succ = mb.successors();
 
 	for(int i = 0; i < mb.nrJoints(); ++i)
 	{
@@ -436,7 +436,7 @@ sva::ForceVecd CentroidalMomentumMatrix::sNormalMomentumDot(const MultiBody& mb,
 void CentroidalMomentumMatrix::init(const rbd::MultiBody& mb)
 {
 	using namespace Eigen;
-	for(int i = 0; i < mb.nrBodies(); ++i)
+	for(Index i(0); i < mb.nrBodies(); ++i)
 	{
 		jacVec_[i] = Jacobian(mb, mb.body(i).id());
 		jacWork_[i].resize(6, jacVec_[i].dof());

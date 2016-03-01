@@ -33,7 +33,7 @@ void InverseDynamics::inverseDynamics(const MultiBody& mb, MultiBodyConfig& mbc)
 {
 	const std::vector<Body>& bodies = mb.bodies();
 	const std::vector<Joint>& joints = mb.joints();
-	const std::vector<int>& pred = mb.predecessors();
+	const std::vector<Index>& pred = mb.predecessors();
 
 	sva::MotionVecd a_0(Eigen::Vector3d::Zero(), mbc.gravity);
 

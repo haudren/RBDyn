@@ -32,7 +32,7 @@ Eigen::Vector3d computeCoM(const MultiBody& mb, const MultiBodyConfig& mbc)
 	Vector3d com = Vector3d::Zero();
 	double totalMass = 0.;
 
-	for(int i = 0; i < mb.nrBodies(); ++i)
+	for(Index i(0); i < mb.nrBodies(); ++i)
 	{
 		double mass = bodies[i].inertia().mass();
 
@@ -55,7 +55,7 @@ Eigen::Vector3d computeCoMVelocity(const MultiBody& mb, const MultiBodyConfig& m
 	Vector3d comV = Vector3d::Zero();
 	double totalMass = 0.;
 
-	for(int i = 0; i < mb.nrBodies(); ++i)
+	for(Index i(0); i < mb.nrBodies(); ++i)
 	{
 		double mass = bodies[i].inertia().mass();
 		totalMass += mass;
@@ -81,7 +81,7 @@ Eigen::Vector3d computeCoMAcceleration(const MultiBody& mb, const MultiBodyConfi
 	Vector3d comA = Vector3d::Zero();
 	double totalMass = 0.;
 
-	for(int i = 0; i < mb.nrBodies(); ++i)
+	for(Index i(0); i < mb.nrBodies(); ++i)
 	{
 		double mass = bodies[i].inertia().mass();
 
@@ -244,7 +244,7 @@ CoMJacobianDummy::sJacobianDot(const MultiBody& mb, const MultiBodyConfig& mbc)
 void CoMJacobianDummy::init(const rbd::MultiBody& mb)
 {
 	using namespace Eigen;
-	for(int i = 0; i < mb.nrBodies(); ++i)
+	for(Index i(0); i < mb.nrBodies(); ++i)
 	{
 		double bodyMass = mb.body(i).inertia().mass();
 		Vector3d comT(0,0,0);
@@ -308,12 +308,12 @@ void CoMJacobian::updateInertialParameters(const MultiBody& mb)
 {
 	double mass = 0.;
 
-	for(int i = 0; i < mb.nrBodies(); ++i)
+	for(Index i(0); i < mb.nrBodies(); ++i)
 	{
 		mass += mb.body(i).inertia().mass();
 	}
 
-	for(int i = 0; i < mb.nrBodies(); ++i)
+	for(Index i(0); i < mb.nrBodies(); ++i)
 	{
 		double bodyMass = mb.body(i).inertia().mass();
 		bodiesCoeff_[i] = (bodyMass*weight_[i])/mass;
@@ -444,10 +444,10 @@ Eigen::Vector3d CoMJacobian::velocity(const MultiBody& mb,
 Eigen::Vector3d CoMJacobian::normalAcceleration(const MultiBody& mb,
 	const MultiBodyConfig& mbc)
 {
-	const std::vector<int>& pred = mb.predecessors();
-	const std::vector<int>& succ = mb.successors();
+	const std::vector<Index>& pred = mb.predecessors();
+	const std::vector<Index>& succ = mb.successors();
 
-	for(int i = 0; i < mb.nrJoints(); ++i)
+	for(Index i(0); i < mb.nrJoints(); ++i)
 	{
 		const sva::PTransformd& X_p_i = mbc.parentToSon[i];
 		const sva::MotionVecd& vj_i = mbc.jointVelocity[i];
@@ -575,11 +575,11 @@ Eigen::Vector3d CoMJacobian::sNormalAcceleration(const MultiBody& mb,
 
 
 // inefficient but the best we can do without mbg
-void jointBodiesSuccessors(const MultiBody& mb, int joint, std::vector<int>& subBodies)
+void jointBodiesSuccessors(const MultiBody& mb, Index joint, std::vector<int>& subBodies)
 {
-	int sonBody = mb.successor(joint);
+	Index sonBody = mb.successor(joint);
 	subBodies.push_back(sonBody);
-	for(int i = 0; i < mb.nrJoints(); ++i)
+	for(Index i(0); i < mb.nrJoints(); ++i)
 	{
 		if(mb.predecessor(i) == sonBody)
 		{
@@ -593,7 +593,7 @@ void CoMJacobian::init(const MultiBody& mb)
 {
 	updateInertialParameters(mb);
 
-	for(int i = 0; i < mb.nrJoints(); ++i)
+	for(Index i(0); i < mb.nrJoints(); ++i)
 	{
 		std::vector<int>& subBodies = jointsSubBodies_[i];
 		jointBodiesSuccessors(mb, i, subBodies);

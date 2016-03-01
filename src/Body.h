@@ -22,6 +22,9 @@
 // SpaceVecAlg
 #include <SpaceVecAlg/SpaceVecAlg>
 
+// XXX: Should come from a separate header
+#include "Joint.h"
+
 namespace rbd
 {
 
@@ -60,7 +63,7 @@ public:
 	{}
 
 	/// @return Body id.
-	int id() const
+	Id id() const
 	{
 		return id_;
 	}
@@ -90,7 +93,7 @@ public:
 private:
 	sva::RBInertiad inertia_;
 
-	int id_;
+	Id id_;
 	std::string name_;
 };
 

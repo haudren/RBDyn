@@ -30,14 +30,13 @@ namespace rbd
 Jacobian::Jacobian()
 {}
 
-Jacobian::Jacobian(const MultiBody& mb, int bodyId, const Eigen::Vector3d& point):
+Jacobian::Jacobian(const MultiBody& mb, Id bodyId, const Eigen::Vector3d& point):
   jointsPath_(),
   point_(point),
   jac_(),
   jacDot_()
 {
-  int index = mb.sBodyIndexById(bodyId);
-
+	Index index = mb.sBodyIndexById(bodyId);
 	int dof = 0;
 	while(index != -1)
 	{
@@ -61,17 +60,17 @@ MultiBody Jacobian::subMultiBody(const MultiBody& mb) const
 	std::vector<int> parent;
 	std::vector<sva::PTransformd> Xt;
 
-	for(int index = 0; index < static_cast<int>(jointsPath_.size()); ++index)
+	for(int idx = 0; idx < static_cast<int>(jointsPath_.size()); ++idx)
 	{
-		int i = jointsPath_[index];
+		Index i = jointsPath_[idx];
 		// body info
 		bodies.push_back(mb.body(i));
-		parent.push_back(index - 1);
+		parent.push_back(idx - 1);
 
 		// joint info
 		joints.push_back(mb.joint(i));
-		succ.push_back(index);
-		pred.push_back(index - 1);
+		succ.push_back(idx);
+		pred.push_back(idx - 1);
 		Xt.push_back(mb.transform(i));
 	}
 
@@ -86,7 +85,7 @@ MultiBody Jacobian::subMultiBody(const MultiBody& mb) const
 template<typename Transform>
 static inline const Eigen::MatrixXd&
 jacobian_(const MultiBody& mb, const MultiBodyConfig& mbc,
-	const Transform& Trans_0_p, const std::vector<int>& jointsPath,
+	const Transform& Trans_0_p, const std::vector<Index>& jointsPath,
 	Eigen::MatrixXd& jac)
 {
 	const std::vector<Joint>& joints = mb.joints();
@@ -94,9 +93,9 @@ jacobian_(const MultiBody& mb, const MultiBodyConfig& mbc,
 
 	sva::PTransformd X_0_p(Trans_0_p);
 
-	for(std::size_t index = 0; index < jointsPath.size(); ++index)
+	for(std::size_t idx = 0; idx < jointsPath.size(); ++idx)
 	{
-		int i = jointsPath[index];
+		Index i = jointsPath[idx];
 
 		sva::PTransformd X_i_N = X_0_p*mbc.bodyPosW[i].inv();
 
@@ -155,7 +154,7 @@ const Eigen::MatrixXd& Jacobian::vectorJacobian(const MultiBody& mb,
 	sva::PTransformd vec = sva::PTransformd(vector);
 	for(std::size_t index = 0; index < jointsPath_.size(); ++index)
 	{
-		int i = jointsPath_[index];
+		Index i = jointsPath_[index];
 
 		sva::PTransformd X_i_N = X_Np*mbc.bodyPosW[i].inv();
 		Eigen::Matrix3d E_i_0(E_N_0*X_i_N.rotation());
@@ -323,12 +322,12 @@ sva::MotionVecd Jacobian::bodyVelocity(const MultiBody& /* mb */,
 
 
 static inline sva::MotionVecd normalAccB_(const rbd::MultiBodyConfig& mbc,
-	const std::vector<int>& jointsPath)
+	const std::vector<Index>& jointsPath)
 {
 	sva::MotionVecd accel(Eigen::Vector6d::Zero());
-	for(std::size_t index = 0; index < jointsPath.size(); ++index)
+	for(std::size_t idx = 0; idx < jointsPath.size(); ++idx)
 	{
-		int i = jointsPath[index];
+		Index i = jointsPath[idx];
 		const sva::PTransformd& X_p_i = mbc.parentToSon[i];
 		const sva::MotionVecd& vj_i = mbc.jointVelocity[i];
 		const sva::MotionVecd& vb_i = mbc.bodyVelB[i];
@@ -421,9 +420,9 @@ void Jacobian::fullJacobian(const MultiBody& mb,
 {
 	res.block(0, 0, jac.rows(), mb.nrDof()).setZero();
 	int jacPos = 0;
-	for(std::size_t index = 0; index < jointsPath_.size(); ++index)
+	for(std::size_t idx = 0; idx < jointsPath_.size(); ++idx)
 	{
-		int i = jointsPath_[index];
+		Index i = jointsPath_[idx];
 		int dof = mb.joint(i).dof();
 		res.block(0, mb.jointPosInDof(i), jac.rows(), dof) =
 			jac.block(0, jacPos, jac.rows(), dof);

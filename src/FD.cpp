@@ -36,7 +36,7 @@ ForwardDynamics::ForwardDynamics(const MultiBody& mb):
 	ldlt_(mb.nrDof())
 {
 	int dofP = 0;
-	for(int i = 0; i < mb.nrJoints(); ++i)
+	for(Index i(0); i < mb.nrJoints(); ++i)
 	{
 		F_[i].resize(6, mb.joint(i).dof());
 		dofPos_[i] = dofP;
@@ -60,7 +60,7 @@ void ForwardDynamics::computeH(const MultiBody& mb, const MultiBodyConfig& mbc)
 {
 	const std::vector<Body>& bodies = mb.bodies();
 	const std::vector<Joint>& joints = mb.joints();
-	const std::vector<int>& pred = mb.predecessors();
+	const std::vector<Index>& pred = mb.predecessors();
 
 	H_.setZero();
 	for(std::size_t i = 0; i < bodies.size(); ++i)
@@ -111,7 +111,7 @@ void ForwardDynamics::computeC(const MultiBody& mb, const MultiBodyConfig& mbc)
 {
 	const std::vector<Body>& bodies = mb.bodies();
 	const std::vector<Joint>& joints = mb.joints();
-	const std::vector<int>& pred = mb.predecessors();
+	const std::vector<Index>& pred = mb.predecessors();
 
 	sva::MotionVecd a_0(Eigen::Vector3d::Zero(), mbc.gravity);
 

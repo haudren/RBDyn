@@ -42,7 +42,7 @@ MultiBodyConfig::MultiBodyConfig(const MultiBody& mb):
 	bodyAccB(mb.nrBodies()),
 	gravity(0., 9.81, 0.)
 {
-	for(int i = 0; i < static_cast<int>(q.size()); ++i)
+	for(Index i(0); i < static_cast<int>(q.size()); ++i)
 	{
 		q[i].resize(mb.joint(i).params());
 		alpha[i].resize(mb.joint(i).dof());
@@ -56,7 +56,7 @@ MultiBodyConfig::MultiBodyConfig(const MultiBody& mb):
 
 void MultiBodyConfig::zero(const MultiBody& mb)
 {
-	for(int i = 0; i < static_cast<int>(q.size()); ++i)
+	for(Index i(0); i < static_cast<int>(q.size()); ++i)
 	{
 		q[i] = mb.joint(i).zeroParam();
 		alpha[i] = mb.joint(i).zeroDof();
@@ -150,7 +150,7 @@ ConfigConverter* ConfigConverter::sConstructor(const MultiBody& from, const Mult
 	if(isOk)
 	{
 		const std::vector<Joint>& joints = from.joints();
-		const std::unordered_map<int, int>& jI2Ito = to.jointIndexById();
+		const std::unordered_map<Id, Index>& jI2Ito = to.jointIndexById();
 
 		for(const Joint& j: joints)
 		{
@@ -165,7 +165,7 @@ ConfigConverter* ConfigConverter::sConstructor(const MultiBody& from, const Mult
 	if(isOk)
 	{
 		const std::vector<Body>& bodies = from.bodies();
-		const std::unordered_map<int, int>& bI2Ito = to.bodyIndexById();
+		const std::unordered_map<Id, Index>& bI2Ito = to.bodyIndexById();
 
 		for(const Body& b: bodies)
 		{
@@ -272,7 +272,7 @@ Eigen::VectorXd sParamToVector(const MultiBody& mb,
 		throw std::out_of_range(str.str());
 	}
 
-	for(int i = 0; i < mb.nrJoints(); ++i)
+	for(Index i(0); i < mb.nrJoints(); ++i)
 	{
 		if(mb.joint(i).params() != static_cast<int>(v[i].size()))
 		{
@@ -309,7 +309,7 @@ Eigen::VectorXd sDofToVector(const MultiBody& mb,
 		throw std::out_of_range(str.str());
 	}
 
-	for(int i = 0; i < mb.nrJoints(); ++i)
+	for(Index i(0); i < mb.nrJoints(); ++i)
 	{
 		if(mb.joint(i).dof() != static_cast<int>(v[i].size()))
 		{
@@ -365,7 +365,7 @@ std::vector<std::vector<double> > vectorToParam(const MultiBody& mb,
 	const Eigen::VectorXd& e)
 {
 	std::vector<std::vector<double>> ret(mb.nrJoints());
-	for(int i = 0; i < mb.nrJoints(); ++i)
+	for(Index i(0); i < mb.nrJoints(); ++i)
 	{
 		ret[i].resize(mb.joint(i).params());
 	}
@@ -395,7 +395,7 @@ std::vector<std::vector<double> > vectorToDof(const MultiBody& mb,
 	const Eigen::VectorXd& e)
 {
 	std::vector<std::vector<double>> ret(mb.nrJoints());
-	for(int i = 0; i < mb.nrJoints(); ++i)
+	for(Index i(0); i < mb.nrJoints(); ++i)
 	{
 		ret[i].resize(mb.joint(i).dof());
 	}
@@ -462,7 +462,7 @@ void checkMatchJointTorque(const MultiBody& mb, const MultiBodyConfig& mbc)
 {
 	checkMatchJointsVector(mb, mbc.jointTorque, "jointTorque");
 
-	for(int i = 0; i < static_cast<int>(mbc.jointTorque.size()); ++i)
+	for(Index i(0); i < static_cast<int>(mbc.jointTorque.size()); ++i)
 	{
 		if(mbc.jointTorque[i].size() != static_cast<std::size_t>(mb.joint(i).dof()))
 		{
@@ -480,7 +480,7 @@ void checkMatchMotionSubspace(const MultiBody& mb, const MultiBodyConfig& mbc)
 {
 	checkMatchJointsVector(mb, mbc.motionSubspace, "motionSubspace");
 
-	for(int i = 0; i < static_cast<int>(mbc.motionSubspace.size()); ++i)
+	for(Index i(0); i < static_cast<int>(mbc.motionSubspace.size()); ++i)
 	{
 		if(mbc.motionSubspace[i].cols() != static_cast<unsigned>(mb.joint(i).dof()))
 		{
@@ -499,7 +499,7 @@ void checkMatchQ(const MultiBody& mb, const MultiBodyConfig& mbc)
 {
 	checkMatchJointsVector(mb, mbc.q, "Generalized position variable vector");
 
-	for(int i = 0; i < static_cast<int>(mbc.q.size()); ++i)
+	for(Index i(0); i < static_cast<int>(mbc.q.size()); ++i)
 	{
 		if(mbc.q[i].size() != static_cast<std::size_t>(mb.joint(i).params()))
 		{
@@ -518,7 +518,7 @@ void checkMatchAlpha(const MultiBody& mb, const MultiBodyConfig& mbc)
 {
 	checkMatchJointsVector(mb, mbc.alpha, "Generalized velocity variable vector");
 
-	for(int i = 0; i < static_cast<int>(mbc.alpha.size()); ++i)
+	for(Index i(0); i < static_cast<int>(mbc.alpha.size()); ++i)
 	{
 		if(mbc.alpha[i].size() != static_cast<std::size_t>(mb.joint(i).dof()))
 		{
@@ -537,7 +537,7 @@ void checkMatchAlphaD(const MultiBody& mb, const MultiBodyConfig& mbc)
 {
 	checkMatchJointsVector(mb, mbc.alphaD, "Generalized acceleration variable vector");
 
-	for(int i = 0; i < static_cast<int>(mbc.alphaD.size()); ++i)
+	for(Index i(0); i < static_cast<int>(mbc.alphaD.size()); ++i)
 	{
 		if(mbc.alphaD[i].size() != static_cast<std::size_t>(mb.joint(i).dof()))
 		{

@@ -38,7 +38,7 @@ public:
 		* @param point Point in the body exprimed in body coordinate.
 		* @throw std::out_of_range If bodyId don't exist.
 		*/
-	Jacobian(const MultiBody& mb, int bodyId,
+	Jacobian(const MultiBody& mb, Id bodyId,
 		const Eigen::Vector3d& point=Eigen::Vector3d::Zero());
 
 	/**
@@ -233,7 +233,7 @@ public:
 	MultiBody subMultiBody(const MultiBody& mb) const;
 
 	/// @return The joint path vector from the root to the specified body.
-	const std::vector<int>& jointsPath() const
+	const std::vector<Index>& jointsPath() const
 	{
 		return jointsPath_;
 	}
@@ -380,7 +380,7 @@ private:
 		const sva::MotionVecd& bodyNNormalAcc) const;
 
 private:
-	std::vector<int> jointsPath_;
+	std::vector<Index> jointsPath_;
 	sva::PTransformd point_;
 
 	Eigen::MatrixXd jac_;

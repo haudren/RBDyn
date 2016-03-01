@@ -81,7 +81,7 @@ sva::RBInertiad sVectorToInertia(const Eigen::VectorXd& vec)
 Eigen::VectorXd multiBodyToInertialVector(const rbd::MultiBody& mb)
 {
 	Eigen::VectorXd vec(mb.nrBodies()*10, 1);
-	for(int i = 0; i < mb.nrBodies(); ++i)
+	for(Index i(0); i < mb.nrBodies(); ++i)
 	{
 		vec.segment(i*10, 10).noalias() = inertiaToVector(mb.body(i).inertia());
 	}
@@ -98,10 +98,10 @@ void IDIM::computeY(const MultiBody& mb, const MultiBodyConfig& mbc)
 {
 	const std::vector<Body>& bodies = mb.bodies();
 	const std::vector<Joint>& joints = mb.joints();
-	const std::vector<int>& pred = mb.predecessors();
+	const std::vector<Index>& pred = mb.predecessors();
 
 	Eigen::Matrix<double, 6, 10> bodyFPhi;
-	for(int i = static_cast<int>(bodies.size()) - 1; i >= 0; --i)
+	for(Index i(static_cast<int>(bodies.size()) - 1); i >= 0; --i)
 	{
 		const sva::MotionVecd& vb_i = mbc.bodyVelB[i];
 		Eigen::Matrix<double, 6, 10> vb_i_Phi(IMPhi(vb_i));
@@ -121,7 +121,7 @@ void IDIM::computeY(const MultiBody& mb, const MultiBodyConfig& mbc)
 		Y_.block(iDofPos, i*10, joints[i].dof(), 10).noalias() =
 			mbc.motionSubspace[i].transpose()*bodyFPhi;
 
-		int j = i;
+		Index j = i;
 		while(pred[j] != -1)
 		{
 			const sva::PTransformd& X_p_j = mbc.parentToSon[j];

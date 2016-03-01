@@ -28,9 +28,30 @@
 #include "Body.h"
 #include "Joint.h"
 
+//Boost
+#include <boost/strong_typedef.hpp>
+
 namespace rbd
 {
+/** Typedef to avoid index and id confusion **/
+BOOST_STRONG_TYPEDEF(int, Index)
+}
 
+namespace std {
+  template<>
+  struct hash<rbd::Index>
+  {
+    std::size_t operator()(const rbd::Index& i) const
+    {
+      using std::size_t;
+      using std::hash;
+      return hash<int>()(i.t);
+    }
+  };
+} //namespace std
+
+namespace rbd
+{
 /**
 	* Kinematic tree of a multibody system.
 	* Same representation as featherstone except joint 0 is the root joint.
@@ -78,13 +99,13 @@ public:
 	}
 
 	/// @return Body at num position in bodies list.
-	const Body& body(int num) const
+	const Body& body(Index num) const
 	{
 		return bodies_[num];
 	}
 
 	/// Set the body num in bodies list.
-	void body(int num, const Body& b)
+	void body(Index num, const Body& b)
 	{
 		bodies_[num] = b;
 	}
@@ -96,43 +117,43 @@ public:
 	}
 
 	/// @return Joint at num position in joint list.
-	const Joint& joint(int num) const
+	const Joint& joint(Index num) const
 	{
 		return joints_[num];
 	}
 
 	/// @return Predeccesor body index of each joint.
-	const std::vector<int>& predecessors() const
+	const std::vector<Index>& predecessors() const
 	{
 		return pred_;
 	}
 
 	/// @return Predecessor body of joint num.
-	int predecessor(int num) const
+	int predecessor(Index num) const
 	{
 		return pred_[num];
 	}
 
 	/// @return Successor body index of each joint.
-	const std::vector<int>& successors() const
+	const std::vector<Index>& successors() const
 	{
 		return succ_;
 	}
 
 	/// @return Successor body of joint num.
-	int successor(int num) const
+	Index successor(Index num) const
 	{
 		return succ_[num];
 	}
 
 	/// @return Parent body index of each body.
-	const std::vector<int>& parents() const
+	const std::vector<Index>& parents() const
 	{
 		return parent_;
 	}
 
 	/// @return Parent body of body num.
-	int parent(int num) const
+	int parent(Index num) const
 	{
 		return parent_[num];
 	}
@@ -150,49 +171,49 @@ public:
 	}
 
 	/// @return Transformation from the body base to joint num
-	const sva::PTransformd& transform(int num) const
+	const sva::PTransformd& transform(Index num) const
 	{
 		return Xt_[num];
 	}
 
 	/// Set the transformation from the body base to joint num
-	void transform(int num, const sva::PTransformd& Xt)
+	void transform(Index num, const sva::PTransformd& Xt)
 	{
 		Xt_[num] = Xt;
 	}
 
 	/// @return Index of the body with Id id.
-	int bodyIndexById(int id) const
+	Index bodyIndexById(Id id) const
 	{
 		return bodyId2Ind_.find(id)->second;
 	}
 
 	/// @return Index of the joint with Id id.
-	int jointIndexById(int id) const
+	int jointIndexById(Id id) const
 	{
 		return jointId2Ind_.find(id)->second;
 	}
 
 	/// @return Hash map of body index by id.
-	const std::unordered_map<int, int>& bodyIndexById() const
+	const std::unordered_map<Id, Index>& bodyIndexById() const
 	{
 		return bodyId2Ind_;
 	}
 
 	/// @return Hash map of joint index by id.
-	const std::unordered_map<int, int>& jointIndexById() const
+	const std::unordered_map<Id, Index>& jointIndexById() const
 	{
 		return jointId2Ind_;
 	}
 
 	/// @return the joint i position in parameter vector (q).
-	int jointPosInParam(int i) const
+	int jointPosInParam(Index i) const
 	{
 		return jointPosInParam_[i];
 	}
 
 	/// @return the joint i position in dof vector (alpha, alphaD…).
-	int jointPosInDof(int i) const
+	int jointPosInDof(Index i) const
 	{
 		return jointPosInDof_[i];
 	}
@@ -338,7 +359,7 @@ public:
 	/** Safe version of @see bodyIndexById.
 		* @throw std::out_of_range.
 		*/
-	int sBodyIndexById(int id) const
+	Index sBodyIndexById(Id id) const
 	{
 		return bodyId2Ind_.at(id);
 	}
@@ -346,7 +367,7 @@ public:
 	/** Safe version of @see jointIndexById.
 		* @throw std::out_of_range.
 		*/
-	int sJointIndexById(int id) const
+	Index sJointIndexById(Id id) const
 	{
 		return jointId2Ind_.at(id);
 	}
@@ -355,14 +376,14 @@ private:
 	std::vector<Body> bodies_;
 	std::vector<Joint> joints_;
 
-	std::vector<int> pred_;
-	std::vector<int> succ_;
-	std::vector<int> parent_;
+	std::vector<Index> pred_;
+	std::vector<Index> succ_;
+	std::vector<Index> parent_;
 	/// Transformation from the body base to joint i
 	std::vector<sva::PTransformd> Xt_;
 
-	std::unordered_map<int, int> bodyId2Ind_;
-	std::unordered_map<int, int> jointId2Ind_;
+	std::unordered_map<Id, Index> bodyId2Ind_;
+	std::unordered_map<Id, Index> jointId2Ind_;
 
 	/// Position of joint i in parameter vector.
 	std::vector<int> jointPosInParam_;

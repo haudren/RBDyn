@@ -35,16 +35,16 @@ MultiBody::MultiBody(std::vector<Body> bodies, std::vector<Joint> joints,
 	std::vector<sva::PTransformd> Xto):
 	bodies_(std::move(bodies)),
 	joints_(std::move(joints)),
-	pred_(std::move(pred)),
-	succ_(std::move(succ)),
-	parent_(std::move(parent)),
+	pred_(pred.size()),
+	succ_(succ.size()),
+	parent_(parent.size()),
 	Xt_(std::move(Xto)),
 	jointPosInParam_(joints_.size()),
 	jointPosInDof_(joints_.size()),
 	nrParams_(0),
 	nrDof_(0)
 {
-	for(int i = 0; i < static_cast<int>(bodies_.size()); ++i)
+	for(Index i(0); i < static_cast<int>(bodies_.size()); ++i)
 	{
 		bodyId2Ind_[bodies_[i].id()] = i;
 		jointId2Ind_[joints_[i].id()] = i;
@@ -55,6 +55,10 @@ MultiBody::MultiBody(std::vector<Body> bodies, std::vector<Joint> joints,
 		nrParams_ += joints_[i].params();
 		nrDof_ += joints_[i].dof();
 	}
+	const std::function<Index(int)> make_index = [](int i) { return Index(i); };
+	std::transform(pred.begin(), pred.end(), pred_.begin(), make_index);
+	std::transform(succ.begin(), succ.end(), succ_.begin(), make_index);
+	std::transform(parent.begin(), parent.end(), parent_.begin(), make_index);
 }
 
 } // namespace rbd
