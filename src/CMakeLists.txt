@@ -17,10 +17,10 @@
 
 set(SOURCES MultiBodyGraph.cpp MultiBody.cpp MultiBodyConfig.cpp
   FK.cpp FV.cpp FA.cpp Jacobian.cpp ID.cpp IK.cpp IS.cpp FD.cpp EulerIntegration.cpp
-  CoM.cpp Momentum.cpp ZMP.cpp IDIM.cpp VisServo.cpp)
+  CoM.cpp Momentum.cpp ZMP.cpp IDIM.cpp VisServo.cpp LeapFrogIntegration.cpp)
 set(HEADERS Body.h Joint.h MultiBodyGraph.h MultiBody.h MultiBodyConfig.h
   FK.h FV.h FA.h Jacobian.h ID.h IK.h IS.h FD.h EulerIntegration.h CoM.h
-  Momentum.h ZMP.h IDIM.h VisServo.h)
+  Momentum.h ZMP.h IDIM.h VisServo.h LeapFrogIntegration.h)
 
 add_library(RBDyn SHARED ${SOURCES} ${HEADERS})
 PKG_CONFIG_USE_DEPENDENCY(RBDyn SpaceVecAlg)

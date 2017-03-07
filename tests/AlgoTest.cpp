@@ -39,6 +39,7 @@
 #include "MultiBodyConfig.h"
 #include "MultiBodyGraph.h"
 #include "EulerIntegration.h"
+#include "LeapFrogIntegration.h"
 #include "Jacobian.h"
 
 // arm
@@ -746,4 +747,64 @@ BOOST_AUTO_TEST_CASE(FailureIKTest)
   BOOST_CHECK(!ik.inverseKinematics(mb, mbc, reachable_target));
   ik.max_iterations_ = 40;
   BOOST_CHECK(ik.inverseKinematics(mb, mbc, reachable_target));
+}
+
+BOOST_AUTO_TEST_CASE(LeapFrogIntegrationTest)
+{
+  using namespace Eigen;
+  rbd::MultiBody mb;
+  rbd::MultiBodyConfig mbc, eulerMbc;
+  rbd::MultiBodyGraph mbg;
+
+  std::tie(mb, mbc, mbg) = makeXYZarm();
+
+  eulerMbc = rbd::MultiBodyConfig(mbc);
+
+  rbd::LeapFrogIntegration lfi(mb);
+
+  /** With constant acceleration, leapfrog IS the same as Euler **/
+  Eigen::VectorXd alphaDVec = Eigen::VectorXd::Random(mb.nrDof());
+  rbd::vectorToParam(alphaDVec, mbc.alphaD);
+  rbd::vectorToParam(alphaDVec, eulerMbc.alphaD);
+  for(int i =0; i < 1000; ++i)
+  {
+    lfi.leapfrogIntegration(mb, mbc, 0.001);
+    rbd::eulerIntegration(mb, eulerMbc, 0.001);
+  }
+
+  for(int i = 0; i < mb.nrJoints(); ++i)
+  {
+    for(int j = 0; j < mb.joint(i).params(); ++j)
+    {
+      BOOST_CHECK_SMALL(mbc.q[i][j] - eulerMbc.q[i][j], TOL);
+    }
+  }
+
+  //Reset
+  mbc.zero(mb);
+  lfi = rbd::LeapFrogIntegration(mb);
+  double timestep = 0.001;
+  double time = 0.0;
+  double omega = 1.0/(20*M_PI);
+
+  Eigen::VectorXd alpha0 = Eigen::VectorXd::Constant(mb.nrDof(), -1.0/omega);
+  rbd::vectorToParam(alpha0, mbc.alpha);
+
+  for(int i =0; i < 10; ++i)
+  {
+    alphaDVec = Eigen::VectorXd::Constant(mb.nrDof(), omega*time).array().sin();
+    rbd::vectorToParam(alphaDVec, mbc.alphaD);
+    rbd::vectorToParam(alphaDVec, eulerMbc.alphaD);
+    lfi.leapfrogIntegration(mb, mbc, timestep);
+    time += timestep;
+  }
+
+  for(int i = 0; i < mb.nrJoints(); ++i)
+  {
+    for(int j = 0; j < mb.joint(i).params(); ++j)
+    {
+      BOOST_CHECK_SMALL(mbc.q[i][j] + std::sin(omega*time)/(omega*omega), TOL);
+    }
+  }
+
 }
